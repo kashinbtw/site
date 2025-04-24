@@ -164,6 +164,6 @@ def admin_news():
         return redirect(url_for('admin_news'))
     sorted_news = sorted(news, key=lambda x: x['id'], reverse=True)
     return render_template('admin_news.html', news=sorted_news, categories=list(CATEGORIES.values()))
-
+#sdfrtgger
 if __name__ == '__main__':
     app.run(debug=True)
