@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Транспорт{% endblock %}
+{% block content %}
+<h2>Транспорт</h2>
+<p>Расписание общественного транспорта, маршруты, новости и изменения в работе транспорта.</p>
+<h3>Новости раздела: {{ category }}</h3>
+{% if news %}
+    <ul>
+    {% for item in news %}
+        <li>
+            <strong>{{ item.title }}</strong><br />
+            <p>{{ item.content }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Новостей в этом разделе пока нет.</p>
+{% endif %}
+{% endblock %}
+

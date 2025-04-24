@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Дорожное хозяйство{% endblock %}
+{% block content %}
+<h2>Дорожное хозяйство</h2>
+<p>Состояние дорог, график ремонта, планы благоустройства и модернизации транспортной инфраструктуры.</p>
+<h3>Новости раздела: {{ category }}</h3>
+{% if news %}
+    <ul>
+    {% for item in news %}
+        <li>
+            <strong>{{ item.title }}</strong><br />
+            <p>{{ item.content }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Новостей в этом разделе пока нет.</p>
+{% endif %}
+{% endblock %}

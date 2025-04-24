@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Управление новостями - Админ{% endblock %}
+{% block content %}
+<h2>Управление новостями</h2>
+
+<h3>Добавить новую новость</h3>
+<form method="post" action="{{ url_for('admin_news') }}">
+    <label for="title">Заголовок:</label><br />
+    <input type="text" id="title" name="title" required maxlength="200" /><br /><br />
+
+    <label for="content">Содержание:</label><br />
+    <textarea id="content" name="content" rows="5" required></textarea><br /><br />
+
+    <label for="category">Раздел:</label><br />
+    <select id="category" name="category" required>
+        <option value="" disabled selected>Выберите раздел</option>
+        {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat }}</option>
+        {% endfor %}
+    </select><br /><br />
+
+    <button type="submit">Добавить новость</button>
+</form>
+
+<hr />
+
+<h3>Список новостей</h3>
+{% if news %}
+    <ul>
+    {% for item in news %}
+        <li><strong>[{{ item.category }}] {{ item.title }}</strong><br />{{ item.content }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Новостей пока нет.</p>
+{% endif %}
+
+<p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+{% endblock %}

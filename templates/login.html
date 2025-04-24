@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Вход в систему{% endblock %}
+{% block content %}
+<h2>Вход в личный кабинет</h2>
+<form method="post" action="{{ url_for('login') }}">
+    <label for="username">Логин:</label><br />
+    <input type="text" id="username" name="username" required /><br /><br />
+    <label for="password">Пароль:</label><br />
+    <input type="password" id="password" name="password" required /><br /><br />
+    <button type="submit">Войти</button>
+</form>
+{% endblock %}

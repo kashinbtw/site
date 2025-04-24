@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+{% block content %}
+<h2>Административная панель</h2>
+<p>Только для администраторов.</p>
+<ul>
+    <li>Управление пользователями</li>
+    <li>Обновление новостей</li>
+	<li><a href="{{ url_for('admin_tickets') }}">Просмотр заявок</a></li>
+    <li><a href="{{ url_for('admin_news') }}">Управление новостями</a></li>
+</ul>
+{% endblock %}

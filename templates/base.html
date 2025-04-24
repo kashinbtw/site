@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Администрация города{% endblock %}</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+<body>
+<header>
+    <h1>Управление ЖКХ, дорожного хозяйства и транспорта администрации города</h1>
+    <nav>
+        <ul>
+			<li><a href="{{ url_for('index') }}">Главная</a></li>
+            <li><a href="{{ url_for('housing') }}">ЖКХ</a></li>
+            <li><a href="{{ url_for('roads') }}">Дорожное хозяйство</a></li>
+            <li><a href="{{ url_for('transport') }}">Транспорт</a></li>
+            {% if session.get('username') %}
+				<li><a href="{{ url_for('profile') }}">Личный кабинет ({{ session['username'] }})</a></li>
+			{% if users[session['username']]['role'] != 'admin' %}
+                <li><a href="{{ url_for('submit_ticket') }}">Оформить заявку</a></li>
+			{% endif %}
+			{% if users[session['username']]['role'] == 'admin' %}
+				<li><a href="{{ url_for('admin_panel') }}">Админ-панель</a></li>
+				<li><a href="{{ url_for('admin_tickets') }}">Заявки пользователей</a></li>
+			{% endif %}
+				<li><a href="{{ url_for('logout') }}">Выйти</a></li>
+			{% else %}
+				<li><a href="{{ url_for('login') }}">Войти</a></li>
+			{% endif %}
+
+        </ul>
+    </nav>
+</header>
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    <p>© 2025 Администрация города</p>
+</footer>
+</body>
+</html>

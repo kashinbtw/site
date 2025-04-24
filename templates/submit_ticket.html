@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Оформление заявки{% endblock %}
+{% block content %}
+<h2>Оформление заявки</h2>
+<form method="post" action="{{ url_for('submit_ticket') }}">
+    <label for="topic">Тема заявки:</label><br />
+    <input type="text" id="topic" name="topic" required maxlength="100" /><br /><br />
+
+    <label for="description">Описание:</label><br />
+    <textarea id="description" name="description" rows="5" required></textarea><br /><br />
+
+    <button type="submit">Отправить заявку</button>
+</form>
+{% endblock %}

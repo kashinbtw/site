@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Заявки пользователей - Админ{% endblock %}
+{% block content %}
+<h2>Все заявки пользователей</h2>
+{% if tickets %}
+    <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Пользователь</th>
+                <th>Тема</th>
+                <th>Описание</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.username }}</td>
+                <td>{{ ticket.topic }}</td>
+                <td>{{ ticket.description }}</td>
+                <td>{{ ticket.status }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Заявок пока нет.</p>
+{% endif %}
+<p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+{% endblock %}

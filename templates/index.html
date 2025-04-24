@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Главная - Администрация города{% endblock %}
+{% block content %}
+<h2>Добро пожаловать на официальный сайт управления ЖКХ, дорожного хозяйства и транспорта администрации города</h2>
+<p>Здесь вы можете узнать актуальную информацию, новости и получить услуги онлайн.</p>
+
+<h3>Новости</h3>
+
+{% for category in categories %}
+    <h4><a href="{{ url_for('category_page', category_name=category) }}">{{ category }}</a></h4>
+    {% if grouped_news[category] %}
+        <ul>
+        {% for item in grouped_news[category][:3] %} {# Показываем 3 последних новости #}
+            <li>
+                <strong>{{ item.title }}</strong><br />
+                <p>{{ item.content }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+        <p><a href="{{ url_for('category_page', category_name=category) }}">Все новости раздела &raquo;</a></p>
+    {% else %}
+        <p>Новостей в этом разделе пока нет.</p>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}
