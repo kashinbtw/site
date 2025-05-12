@@ -1,32 +1,103 @@
 {% extends "base.html" %}
 {% block title %}Заявки пользователей - Админ{% endblock %}
 {% block content %}
-<h2>Все заявки пользователей</h2>
-{% if tickets %}
-    <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+<style>
+  h2 {
+    color: #004080;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  p {
+    font-size: 1rem;
+    color: #333;
+    margin-top: 1rem;
+  }
+  a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a:hover,
+  a:focus {
+    text-decoration: underline;
+  }
+
+  /* Стили для таблицы */
+  .responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  .responsive-table thead {
+    background-color: #0066cc;
+    color: white;
+  }
+  .responsive-table th,
+  .responsive-table td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  .responsive-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+    p, a {
+      font-size: 0.95rem;
+    }
+
+    /* Вертикальная прокрутка для таблицы */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+  }
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.3rem;
+    }
+    p, a {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div style="max-width: 900px; margin: 0 auto; padding: 15px;">
+  <h2>Все заявки пользователей</h2>
+
+  {% if tickets %}
+    <div class="table-wrapper">
+      <table class="responsive-table" role="table" aria-label="Таблица заявок пользователей">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Пользователь</th>
-                <th>Тема</th>
-                <th>Описание</th>
-                <th>Статус</th>
-            </tr>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Пользователь</th>
+            <th scope="col">Тема</th>
+            <th scope="col">Описание</th>
+            <th scope="col">Статус</th>
+          </tr>
         </thead>
         <tbody>
-        {% for ticket in tickets %}
+          {% for ticket in tickets %}
             <tr>
-                <td>{{ ticket.id }}</td>
-                <td>{{ ticket.username }}</td>
-                <td>{{ ticket.topic }}</td>
-                <td>{{ ticket.description }}</td>
-                <td>{{ ticket.status }}</td>
+              <td>{{ ticket.id }}</td>
+              <td>{{ ticket.username }}</td>
+              <td>{{ ticket.topic }}</td>
+              <td>{{ ticket.description }}</td>
+              <td>{{ ticket.status }}</td>
             </tr>
-        {% endfor %}
+          {% endfor %}
         </tbody>
-    </table>
-{% else %}
+      </table>
+    </div>
+  {% else %}
     <p>Заявок пока нет.</p>
-{% endif %}
-<p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+  {% endif %}
+
+  <p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+</div>
 {% endblock %}

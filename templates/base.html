@@ -4,30 +4,141 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Администрация города{% endblock %}</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      /* Сброс и базовые стили */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f9f9f9;
+        color: #333;
+        line-height: 1.5;
+      }
+      header {
+        background: #004080;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+      }
+      header h1 {
+        font-size: 1.6rem;
+      }
+      nav {
+        background: #0066cc;
+        position: relative;
+      }
+      nav ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      nav li {
+        margin: 0 10px;
+      }
+      nav a {
+        display: block;
+        padding: 12px 15px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+      nav a:hover,
+      nav a:focus {
+        background: #004d99;
+        outline: none;
+      }
+      main {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 0 15px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+      footer {
+        background: #004080;
+        color: white;
+        text-align: center;
+        padding: 15px 10px;
+        margin-top: 30px;
+        font-size: 0.9rem;
+      }
+      .flash {
+        padding: 10px 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+      }
+      .flash-error {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .flash-success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      /* Мобильное меню: кнопка */
+      .menu-toggle {
+        display: none;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: #004080;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 3px;
+        z-index: 1000;
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+        flex-direction: column;
+    }
+        nav ul.active {
+          display: flex;
+        }
+        nav li {
+          margin: 5px 0;
+          text-align: center;
+        }
+        .menu-toggle {
+          display: block;
+        }
+      }
+    </style>
+</head>
 <body>
 <header>
-    <h1>Управление ЖКХ, дорожного хозяйства и транспорта администрации города</h1>
+    <h1 color:#333>Управление ЖКХ, дорожного хозяйства и транспорта администрации города</h1>
     <nav>
+        <button class="menu-toggle" aria-label="Открыть меню">&#9776;</button>
         <ul>
-			<li><a href="{{ url_for('index') }}">Главная</a></li>
+            <li><a href="{{ url_for('index') }}">Главная</a></li>
             <li><a href="{{ url_for('housing') }}">ЖКХ</a></li>
             <li><a href="{{ url_for('roads') }}">Дорожное хозяйство</a></li>
             <li><a href="{{ url_for('transport') }}">Транспорт</a></li>
             {% if session.get('username') %}
-				<li><a href="{{ url_for('profile') }}">Личный кабинет ({{ session['username'] }})</a></li>
-			{% if users[session['username']]['role'] != 'admin' %}
-                <li><a href="{{ url_for('submit_ticket') }}">Оформить заявку</a></li>
-			{% endif %}
-			{% if users[session['username']]['role'] == 'admin' %}
-				<li><a href="{{ url_for('admin_panel') }}">Админ-панель</a></li>
-				<li><a href="{{ url_for('admin_tickets') }}">Заявки пользователей</a></li>
-			{% endif %}
-				<li><a href="{{ url_for('logout') }}">Выйти</a></li>
-			{% else %}
-				<li><a href="{{ url_for('login') }}">Войти</a></li>
-			{% endif %}
-
+                <li><a href="{{ url_for('profile') }}">Личный кабинет ({{ session['username'] }})</a></li>
+                {% if users[session['username']]['role'] != 'admin' %}
+                    <li><a href="{{ url_for('submit_ticket') }}">Оформить заявку</a></li>
+                {% endif %}
+                {% if users[session['username']]['role'] == 'admin' %}
+                    <li><a href="{{ url_for('admin_panel') }}">Админ-панель</a></li>
+                    <li><a href="{{ url_for('admin_tickets') }}">Заявки пользователей</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Выйти</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Войти</a></li>
+            {% endif %}
         </ul>
     </nav>
 </header>
@@ -44,5 +155,14 @@
 <footer>
     <p>© 2025 Администрация города</p>
 </footer>
+
+<script>
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navUl = document.querySelector('nav ul');
+
+  menuToggle.addEventListener('click', () => {
+    navUl.classList.toggle('active');
+  });
+</script>
 </body>
 </html>

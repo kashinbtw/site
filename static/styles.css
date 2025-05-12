@@ -45,7 +45,10 @@ section {
     margin-bottom: 2rem;
 }
 
-h1,
+h1 {
+    color: white;
+}
+
 h2 {
     color: #004080;
 }

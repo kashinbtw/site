@@ -1,26 +1,111 @@
 {% extends "base.html" %}
 {% block title %}Главная - Администрация города{% endblock %}
+
 {% block content %}
-<h2>Добро пожаловать на официальный сайт управления ЖКХ, дорожного хозяйства и транспорта администрации города</h2>
-<p>Здесь вы можете узнать актуальную информацию, новости и получить услуги онлайн.</p>
+<style>
+  /* Базовые стили */
+  h2 {
+    color: #004080;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  h3 {
+    color: #0066cc;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  h4 a {
+    color: #004080;
+    text-decoration: none;
+  }
+  h4 a:hover,
+  h4 a:focus {
+    text-decoration: underline;
+  }
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  ul {
+    list-style: disc inside;
+    margin-bottom: 1rem;
+    padding-left: 0;
+  }
+  li {
+    margin-bottom: 1rem;
+  }
+  li strong {
+    font-weight: 700;
+  }
+  a.more-link {
+    color: #0066cc;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  a.more-link:hover,
+  a.more-link:focus {
+    text-decoration: underline;
+  }
 
-<h3>Новости</h3>
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+    h3 {
+      font-size: 1.3rem;
+    }
+    h4 {
+      font-size: 1.1rem;
+    }
+    p, li {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.3rem;
+    }
+    h3 {
+      font-size: 1.1rem;
+    }
+    h4 {
+      font-size: 1rem;
+    }
+    p, li {
+      font-size: 0.9rem;
+    }
+  }
+</style>
 
-{% for category in categories %}
-    <h4><a href="{{ url_for('category_page', category_name=category) }}">{{ category }}</a></h4>
-    {% if grouped_news[category] %}
+<div class="content-wrapper" style="max-width: 900px; margin: 0 auto; padding: 15px;">
+  <h2>Добро пожаловать на официальный сайт управления ЖКХ, дорожного хозяйства и транспорта администрации города</h2>
+  <p>Здесь вы можете узнать актуальную информацию, новости и получить услуги онлайн.</p>
+
+  <h3>Новости</h3>
+
+  {% for category in categories %}
+    <section aria-labelledby="category-{{ loop.index }}">
+      <h4 id="category-{{ loop.index }}">
+        <a href="{{ url_for('category_page', category_name=category) }}">{{ category }}</a>
+      </h4>
+      {% if grouped_news[category] %}
         <ul>
-        {% for item in grouped_news[category][:3] %} {# Показываем 3 последних новости #}
+          {% for item in grouped_news[category][:3] %} {# Показываем 3 последних новости #}
             <li>
-                <strong>{{ item.title }}</strong><br />
-                <p>{{ item.content }}</p>
+              <strong>{{ item.title }}</strong><br />
+              <p>{{ item.content }}</p>
             </li>
-        {% endfor %}
+          {% endfor %}
         </ul>
-        <p><a href="{{ url_for('category_page', category_name=category) }}">Все новости раздела &raquo;</a></p>
-    {% else %}
+        <p><a class="more-link" href="{{ url_for('category_page', category_name=category) }}">Все новости раздела &raquo;</a></p>
+      {% else %}
         <p>Новостей в этом разделе пока нет.</p>
-    {% endif %}
-{% endfor %}
-
+      {% endif %}
+    </section>
+  {% endfor %}
+</div>
 {% endblock %}

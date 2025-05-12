@@ -1,20 +1,75 @@
 {% extends "base.html" %}
 {% block title %}Новости - {{ category }}{% endblock %}
 {% block content %}
-<h2>Новости раздела: {{ category }}</h2>
+<style>
+  /* Базовые стили */
+  h2 {
+    color: #004080;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  ul {
+    list-style: disc inside;
+    padding-left: 0;
+    margin-bottom: 1rem;
+  }
+  li {
+    margin-bottom: 1.2rem;
+  }
+  li strong {
+    font-weight: 700;
+  }
+  a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a:hover,
+  a:focus {
+    text-decoration: underline;
+  }
 
-{% if news %}
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+    p, li {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.3rem;
+    }
+    p, li {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div style="max-width: 900px; margin: 0 auto; padding: 15px;">
+  <h2>Новости раздела: {{ category }}</h2>
+
+  {% if news %}
     <ul>
-    {% for item in news %}
+      {% for item in news %}
         <li>
-            <strong>{{ item.title }}</strong><br />
-            <p>{{ item.content }}</p>
+          <strong>{{ item.title }}</strong><br />
+          <p>{{ item.content }}</p>
         </li>
-    {% endfor %}
+      {% endfor %}
     </ul>
-{% else %}
+  {% else %}
     <p>Новостей в этом разделе пока нет.</p>
-{% endif %}
+  {% endif %}
 
-<p><a href="{{ url_for('index') }}">← Вернуться на главную</a></p>
+  <p><a href="{{ url_for('index') }}">← Вернуться на главную</a></p>
+</div>
 {% endblock %}

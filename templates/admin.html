@@ -1,12 +1,71 @@
 {% extends "base.html" %}
 {% block title %}Админ-панель{% endblock %}
 {% block content %}
-<h2>Административная панель</h2>
-<p>Только для администраторов.</p>
-<ul>
+<style>
+  /* Базовые стили */
+ h2 {
+    color: #004080;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  h3 {
+    color: #0066cc;
+    font-size: 1.4rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  ul {
+    list-style: disc inside;
+    padding-left: 0;
+    margin-bottom: 1rem;
+  }
+  li {
+    margin-bottom: 1.2rem;
+  }
+  li strong {
+    font-weight: 700;
+  }
+
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    h2 {
+      font-size: 1.5rem;
+    }
+    h3 {
+      font-size: 1.2rem;
+    }
+    p, li {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.3rem;
+    }
+    h3 {
+      font-size: 1rem;
+    }
+    p, li {
+      font-size: 0.9rem;
+    }
+  }
+
+</style>
+
+<div style="max-width: 700px; margin: 0 auto; padding: 15px;">
+  <h2>Административная панель</h2>
+  <p>Только для администраторов.</p>
+  <ul>
     <li>Управление пользователями</li>
     <li>Обновление новостей</li>
-	<li><a href="{{ url_for('admin_tickets') }}">Просмотр заявок</a></li>
+    <li><a href="{{ url_for('admin_tickets') }}">Просмотр заявок</a></li>
     <li><a href="{{ url_for('admin_news') }}">Управление новостями</a></li>
-</ul>
+  </ul>
+</div>
 {% endblock %}
