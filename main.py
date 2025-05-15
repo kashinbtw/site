@@ -1,5 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash, abort
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+import logging
+from functools import wraps
 from sqlalchemy import Column, Integer, String, Enum, Text
 import enum
 
@@ -39,7 +42,7 @@ class News(db.Model):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), nullable=False)
-
+    date = db.Column(db.DateTime, default=datetime.utcnow)
     def __repr__(self):
         return f"News('{self.title}', '{self.category}')"
 
@@ -49,10 +52,18 @@ class Ticket(db.Model):
     username = db.Column(db.String(20), nullable=False)
     topic = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    address = db.Column(db.Text, nullable=False)
+    contact_person = db.Column(db.Text, nullable=False)
     status = db.Column(db.Enum(TicketStatus), default=TicketStatus.NEW)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"Ticket('{self.topic}', '{self.username}', '{self.status}')"
+
+    @property
+    def status_label(self):
+        # Возвращает человекочитаемое значение статуса
+        return self.status.value
 
 
 # Создание таблиц в базе данных
@@ -79,13 +90,17 @@ CATEGORIES = {
 
 # Декоратор для проверки авторизации пользователя
 def login_required(f):
-    from functools import wraps
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
             flash('Пожалуйста, войдите в систему.', 'warning')
             return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            logging.error(f"Ошибка в функции {f.__name__}: {e}", exc_info=True)
+            flash('Произошла внутренняя ошибка. Пожалуйста, попробуйте позже.', 'danger')
+            return redirect(url_for('index'))  # или другая страница
     return decorated_function
 
 
@@ -111,11 +126,33 @@ def inject_users():
 # Маршруты приложения
 @app.route('/')
 def index():
-    news = News.query.all()
-    grouped_news = {v: [] for v in CATEGORIES.values()}
+    q = request.args.get('q', '').strip()
+
+    # Формируем базовый запрос
+    query = News.query
+    if q:
+        # Фильтрация по заголовку (нечувствительно к регистру)
+        query = query.filter(News.title.ilike(f'%{q}%'))
+
+    # Получаем отсортированный список новостей
+    news = query.order_by(News.date.desc()).all()
+
+    # Инициализируем словарь группировки по категориям
+    grouped_news = {category: [] for category in CATEGORIES.values()}
+
+    # Заполняем grouped_news новостями, учитывая категории
     for item in news:
-        grouped_news[item.category].append(item)
-    return render_template('index.html', grouped_news=grouped_news, categories=list(CATEGORIES.values()))
+        if item.category in grouped_news:
+            grouped_news[item.category].append(item)
+        else:
+            # Если категория новости отсутствует в CATEGORIES, можно добавить или пропустить
+            grouped_news.setdefault(item.category, []).append(item)
+
+    # Передаём в шаблон список категорий и сгруппированные новости
+    return render_template('index.html',
+                           grouped_news=grouped_news,
+                           categories=list(CATEGORIES.values()),
+                           q=q)  # Можно передать q для отображения в форме поиска
 
 
 @app.route('/housing')
@@ -177,17 +214,30 @@ def submit_ticket():
     if request.method == 'POST':
         topic = request.form.get('topic', '').strip()
         description = request.form.get('description', '').strip()
+        address = request.form.get('address', '').strip()  # исправлено имя поля
+        contact_person = request.form.get('contact_person', '').strip()  # исправлено имя поля
+
         if not topic or not description:
             flash('Пожалуйста, заполните все поля.', 'warning')
             return redirect(url_for('submit_ticket'))
+
         username = session['username']
-        ticket = Ticket(username=username, topic=topic, description=description)
+        ticket = Ticket(
+            username=username,
+            topic=topic,
+            description=description,
+            address=address,
+            contact_person=contact_person
+        )
         db.session.add(ticket)
         db.session.commit()
         flash('Заявка успешно отправлена.', 'success')
-        return redirect(url_for('profile'))
-    return render_template('submit_ticket.html')
+        return redirect(url_for('submit_ticket'))  # после отправки возвращаемся на страницу с формой и списком заявок
 
+    # Обработка GET-запроса - получаем заявки пользователя и передаём в шаблон
+    username = session['username']
+    tickets = Ticket.query.filter_by(username=username).order_by(Ticket.id.desc()).all()
+    return render_template('submit_ticket.html', tickets=tickets)
 
 @app.route('/admin')
 @admin_required

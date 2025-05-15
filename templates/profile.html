@@ -77,7 +77,10 @@
         <li>
           <strong>Тема:</strong> {{ ticket.topic }}<br />
           <strong>Описание:</strong> {{ ticket.description }}<br />
-          <strong>Статус:</strong> {{ ticket.status }}
+          <strong>Статус:</strong> {{ ticket.status_label }}<br />
+          <strong>Адрес:</strong> {{ ticket.address }}<br />
+          <strong>Контактное лицо:</strong> {{ ticket.contact_person }}
+		  <p><strong>Дата обращения:</strong> {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
         </li>
       {% endfor %}
     </ul>

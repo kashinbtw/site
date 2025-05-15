@@ -45,6 +45,32 @@
     outline: none;
   }
 
+  /* Цвета для статусов заявок */
+  .status-new {
+    background-color: #ffdddd; /* красный оттенок для новых */
+  }
+  .status-in-progress {
+    background-color: #fff4cc; /* желтый для в работе */
+  }
+  .status-completed {
+    background-color: #ddffdd; /* зеленый для завершенных */
+  }
+  .ticket-item {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .ticket-photo {
+    max-width: 200px;
+    max-height: 150px;
+    margin-top: 10px;
+    display: block;
+  }
+  .ticket-info p {
+    margin: 5px 0;
+  }
+
   /* Адаптивность */
   @media (max-width: 768px) {
     h2 {
@@ -78,7 +104,34 @@
       <label for="description">Описание:</label>
       <textarea id="description" name="description" rows="5" required></textarea>
 
+      <label for="address">Адрес:</label>
+      <input type="text" id="address" name="address" maxlength="200" />
+
+      <label for="contact_person">Контактное лицо:</label>
+      <input type="text" id="contact_person" name="contact_person" maxlength="100" />
+
       <button type="submit">Отправить заявку</button>
   </form>
+
+  <hr />
+
+  <h2>Мои заявки</h2>
+  {% if tickets %}
+    {% for ticket in tickets %}
+      <div class="ticket-item status-{{ ticket.status | lower | replace(' ', '-') }}">
+        <h3>{{ ticket.topic }}</h3>
+        <p>{{ ticket.description }}</p>
+
+        <div class="ticket-info">
+          <p><strong>Адрес:</strong> {{ ticket.address or 'Не указан' }}</p>
+          <p><strong>Контактное лицо:</strong> {{ ticket.contact_person or 'Не указано' }}</p>
+          <p><strong>Статус:</strong> {{ ticket.status_label }}</p>
+		  <p><strong>Дата обращения:</strong> {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>Заявок пока нет.</p>
+  {% endif %}
 </div>
 {% endblock %}
