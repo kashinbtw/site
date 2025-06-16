@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Интерактивная карта</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="map-container" style="height: 600px;">
+                        {{ map|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Условные обозначения:</h5>
+                    <ul>
+                        <li><span style="color: red;">●</span> - Новая заявка</li>
+                        <li><span style="color: green;">●</span> - Заявка в работе или решена</li>
+                        <li><span style="color: blue;">●</span> - Объект инфраструктуры</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

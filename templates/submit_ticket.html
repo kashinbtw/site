@@ -95,43 +95,116 @@
   }
 </style>
 
-<div style="max-width: 700px; margin: 0 auto; padding: 15px;">
-  <h2>Оформление заявки</h2>
-  <form method="post" action="{{ url_for('submit_ticket') }}">
-      <label for="topic">Тема заявки:</label>
-      <input type="text" id="topic" name="topic" required maxlength="100" />
-
-      <label for="description">Описание:</label>
-      <textarea id="description" name="description" rows="5" required></textarea>
-
-      <label for="address">Адрес:</label>
-      <input type="text" id="address" name="address" maxlength="200" />
-
-      <label for="contact_person">Контактное лицо:</label>
-      <input type="text" id="contact_person" name="contact_person" maxlength="100" />
-
-      <button type="submit">Отправить заявку</button>
-  </form>
-
-  <hr />
-
-  <h2>Мои заявки</h2>
-  {% if tickets %}
-    {% for ticket in tickets %}
-      <div class="ticket-item status-{{ ticket.status | lower | replace(' ', '-') }}">
-        <h3>{{ ticket.topic }}</h3>
-        <p>{{ ticket.description }}</p>
-
-        <div class="ticket-info">
-          <p><strong>Адрес:</strong> {{ ticket.address or 'Не указан' }}</p>
-          <p><strong>Контактное лицо:</strong> {{ ticket.contact_person or 'Не указано' }}</p>
-          <p><strong>Статус:</strong> {{ ticket.status_label }}</p>
-		  <p><strong>Дата обращения:</strong> {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+<div class="container mt-4">
+    <h2>Создать заявку</h2>
+    
+    <!-- Форма создания заявки -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Новая заявка</h4>
         </div>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>Заявок пока нет.</p>
-  {% endif %}
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="topic">Тема заявки</label>
+                    <input type="text" class="form-control" id="topic" name="topic" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Описание проблемы</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="address">Адрес</label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact_person">Контактное лицо</label>
+                    <input type="text" class="form-control" id="contact_person" name="contact_person" required>
+                </div>
+                <div class="form-group">
+                    <label for="photos">Фотографии (необязательно)</label>
+                    <input type="file" class="form-control-file" id="photos" name="photos" multiple accept="image/*">
+                    <small class="form-text text-muted">Вы можете загрузить несколько фотографий</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить заявку</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Список заявок пользователя -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Мои заявки</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Тема</th>
+                            <th>Статус</th>
+                            <th>Дата создания</th>
+                            <th>Фотографии</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.topic }}</td>
+                            <td>{{ ticket.status.value }}</td>
+                            <td>{{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>
+                                {% for photo in ticket.photos %}
+                                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+                                     alt="Фото к заявке" 
+                                     style="max-width: 100px; margin: 5px;">
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}" class="btn btn-sm btn-info">Просмотр</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+let searchTimeout;
+
+function updateTickets() {
+    const searchQuery = document.getElementById('searchInput').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    fetch(`/api/search_user_tickets?q=${encodeURIComponent(searchQuery)}&status=${encodeURIComponent(statusFilter)}`)
+        .then(response => response.json())
+        .then(tickets => {
+            const tbody = document.getElementById('ticketsTableBody');
+            tbody.innerHTML = '';
+            
+            tickets.forEach(ticket => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ticket.id}</td>
+                    <td><a href="/ticket/${ticket.id}">${ticket.topic}</a></td>
+                    <td>${ticket.description}</td>
+                    <td>${ticket.status}</td>
+                    <td>${ticket.created_at}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(updateTickets, 300);
+});
+
+document.getElementById('statusFilter').addEventListener('change', updateTickets);
+</script>
 {% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ news.title }}</h2>
+                    <p class="text-muted">Категория: {{ news.category }} | Дата: {{ news.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                    
+                    {% if news.image_path %}
+                    <img src="{{ url_for('static', filename='uploads/' + news.image_path) }}" class="img-fluid mb-3" alt="{{ news.title }}">
+                    {% endif %}
+                    
+                    <div class="card-text">
+                        {{ news.content|safe }}
+                    </div>
+                    
+                    {% if session.get('username') and users[session['username']]['role'] == 'admin' %}
+                    <div class="mt-3">
+                        <a href="{{ url_for('edit_news', news_id=news.id) }}" class="btn btn-primary">Редактировать</a>
+                        <form action="{{ url_for('delete_news', news_id=news.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">Удалить</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Комментарии</h4>
+                </div>
+                <div class="card-body">
+                    {% if session.get('username') %}
+                    <form action="{{ url_for('add_comment', news_id=news.id) }}" method="POST" class="mb-4">
+                        <div class="mb-3">
+                            <textarea name="content" class="form-control" rows="3" required placeholder="Ваш комментарий..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+                    </form>
+                    {% else %}
+                    <p>Чтобы оставить комментарий, пожалуйста, <a href="{{ url_for('login') }}">войдите</a> в систему.</p>
+                    {% endif %}
+                    
+                    {% for comment in news.comments|sort(attribute='date', reverse=true) %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">{{ comment.username }} | {{ comment.date.strftime('%d.%m.%Y %H:%M') }}</h6>
+                            <p class="card-text">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

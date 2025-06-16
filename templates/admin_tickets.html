@@ -66,38 +66,124 @@
   }
 </style>
 
-<div style="max-width: 900px; margin: 0 auto; padding: 15px;">
-  <h2>Все заявки пользователей</h2>
-
-  {% if tickets %}
-    <div class="table-wrapper">
-      <table class="responsive-table" role="table" aria-label="Таблица заявок пользователей">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Пользователь</th>
-            <th scope="col">Тема</th>
-            <th scope="col">Описание</th>
-            <th scope="col">Статус</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ticket in tickets %}
-            <tr>
-              <td>{{ ticket.id }}</td>
-              <td>{{ ticket.username }}</td>
-              <td>{{ ticket.topic }}</td>
-              <td>{{ ticket.description }}</td>
-              <td>{{ ticket.status_label }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Управление заявками</h2>
+        <a href="{{ url_for('show_map') }}" class="btn btn-primary">
+            <i class="fas fa-map-marker-alt"></i> Показать на карте
+        </a>
     </div>
-  {% else %}
-    <p>Заявок пока нет.</p>
-  {% endif %}
 
-  <p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по теме, описанию или пользователю...">
+        </div>
+        <div class="col-md-4">
+            <select id="statusFilter" class="form-control">
+                <option value="">Все статусы</option>
+                <option value="Новая">Новая</option>
+                <option value="В работе">В работе</option>
+                <option value="Решена">Решена</option>
+                <option value="Закрыта">Закрыта</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пользователь</th>
+                    <th>Тема</th>
+                    <th>Описание</th>
+                    <th>Статус</th>
+                    <th>Дата создания</th>
+                </tr>
+            </thead>
+            <tbody id="ticketsTableBody">
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.username }}</td>
+                    <td><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}">{{ ticket.topic }}</a></td>
+                    <td>{{ ticket.description }}</td>
+                    <td>
+                        <select class="form-control status-select" data-ticket-id="{{ ticket.id }}">
+                            <option value="Новая" {% if ticket.status.value == 'Новая' %}selected{% endif %}>Новая</option>
+                            <option value="В работе" {% if ticket.status.value == 'В работе' %}selected{% endif %}>В работе</option>
+                            <option value="Решена" {% if ticket.status.value == 'Решена' %}selected{% endif %}>Решена</option>
+                            <option value="Закрыта" {% if ticket.status.value == 'Закрыта' %}selected{% endif %}>Закрыта</option>
+                        </select>
+                    </td>
+                    <td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Модальное окно для просмотра заявки -->
+<div class="modal fade" id="ticketModal" tabindex="-1" role="dialog" aria-labelledby="ticketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ticketModalLabel">Детали заявки</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="ticketDetails"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Обработка изменения статуса
+    $('.status-select').change(function() {
+        var ticketId = $(this).data('ticket-id');
+        var newStatus = $(this).val();
+        
+        $.post('/api/update_ticket_status/' + ticketId, {
+            status: newStatus
+        })
+        .done(function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert('Ошибка при обновлении статуса');
+            }
+        })
+        .fail(function() {
+            alert('Ошибка при обновлении статуса');
+        });
+    });
+
+    // Поиск и фильтрация
+    function filterTickets() {
+        var searchText = $('#searchInput').val().toLowerCase();
+        var statusFilter = $('#statusFilter').val();
+        
+        $('#ticketsTableBody tr').each(function() {
+            var row = $(this);
+            var text = row.text().toLowerCase();
+            var status = row.find('.status-select').val();
+            
+            var matchesSearch = text.includes(searchText);
+            var matchesStatus = !statusFilter || status === statusFilter;
+            
+            row.toggle(matchesSearch && matchesStatus);
+        });
+    }
+
+    $('#searchInput').on('keyup', filterTickets);
+    $('#statusFilter').change(filterTickets);
+});
+</script>
+
+<p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
 {% endblock %}

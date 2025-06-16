@@ -1,153 +1,78 @@
 {% extends "base.html" %}
 {% block title %}Управление новостями - Админ{% endblock %}
 {% block content %}
-<style>
-  /* Базовые стили */
-  h2 {
-    color: #004080;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  h3 {
-    color: #0066cc;
-    font-size: 1.4rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-  }
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 0.3rem;
-    color: #333;
-  }
-  input[type="text"],
-  textarea,
-  select {
-    width: 100%;
-    max-width: 600px;
-    padding: 8px 10px;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-  textarea {
-    resize: vertical;
-  }
-  button {
-    background-color: #0066cc;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  button:hover,
-  button:focus {
-    background-color: #004d99;
-    outline: none;
-  }
-  .news-list ul {
-    list-style: disc inside;
-    max-width: 700px;
-    padding-left: 0;
-    margin-top: 1rem;
-}
-  .news-list li {
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    color: #333;
-}
-  li strong {
-    color: #004080;
-  }
-  a {
-    color: #0066cc;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  a:hover,
-  a:focus {
-    text-decoration: underline;
-  }
-  hr {
-    margin: 2rem 0;
-    border: none;
-    border-top: 1px solid #ccc;
-  }
-
-  /* Адаптивность */
-  @media (max-width: 768px) {
-    h2 {
-      font-size: 1.5rem;
-    }
-    h3 {
-      font-size: 1.2rem;
-    }
-    input[type="text"],
-    textarea,
-    select,
-    button {
-      max-width: 100%;
-      font-size: 1rem;
-    }
-    li {
-      font-size: 0.95rem;
-    }
-  }
-  @media (max-width: 480px) {
-    h2 {
-      font-size: 1.3rem;
-    }
-    h3 {
-      font-size: 1rem;
-    }
-    li {
-      font-size: 0.9rem;
-    }
-  }
-</style>
-
-<div style="max-width: 700px; margin: 0 auto; padding: 15px;">
-  <h2>Управление новостями</h2>
-
-  <h3>Добавить новую новость</h3>
-  <form method="post" action="{{ url_for('admin_news') }}">
-      <label for="title">Заголовок:</label>
-      <input type="text" id="title" name="title" required maxlength="200" />
-
-      <label for="content">Содержание:</label>
-      <textarea id="content" name="content" rows="5" required></textarea>
-
-      <label for="category">Раздел:</label>
-      <select id="category" name="category" required>
-          <option value="" disabled selected>Выберите раздел</option>
-          {% for cat in categories %}
-              <option value="{{ cat }}">{{ cat }}</option>
-          {% endfor %}
-      </select>
-
-      <button type="submit">Добавить новость</button>
-  </form>
-
-  <hr />
-
-  <h3>Список новостей</h3>
-  {% if news %}
-	<div class="news-list">
-      <ul>
-      {% for item in news %}
-          <li><strong>[{{ item.category }}] {{ item.title }}</strong><br />{{ item.content }}</li>
-      {% endfor %}
-      </ul>
-  {% else %}
-      <p>Новостей пока нет.</p>
-  {% endif %}
-		</div>
-  <p><a href="{{ url_for('admin_panel') }}">Назад в админ-панель</a></p>
+<div class="container mt-4">
+    <h2>Управление новостями</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Добавить новость</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Заголовок</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="category" class="form-label">Категория</label>
+                    <select class="form-select" id="category" name="category" required>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="content" class="form-label">Содержание</label>
+                    <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="image" class="form-label">Изображение</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Добавить новость</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h4>Список новостей</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Заголовок</th>
+                            <th>Категория</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in news %}
+                        <tr>
+                            <td>{{ item.title }}</td>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.date.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('news_detail', news_id=item.id) }}" class="btn btn-sm btn-info">Просмотр</a>
+                                <a href="{{ url_for('edit_news', news_id=item.id) }}" class="btn btn-sm btn-primary">Редактировать</a>
+                                <form action="{{ url_for('delete_news', news_id=item.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту новость?')">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

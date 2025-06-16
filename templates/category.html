@@ -54,22 +54,30 @@
   }
 </style>
 
-<div style="max-width: 900px; margin: 0 auto; padding: 15px;">
-  <h2>Новости раздела: {{ category }}</h2>
-
-  {% if news %}
-    <ul>
-      {% for item in news %}
-        <li>
-          <strong>{{ item.title }}</strong><br />
-          <p>{{ item.content }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>Новостей в этом разделе пока нет.</p>
-  {% endif %}
-
-  <p><a href="{{ url_for('index') }}">← Вернуться на главную</a></p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>{{ category }}</h2>
+            
+            {% if news %}
+            {% for item in news %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('news_detail', news_id=item.id) }}" class="text-decoration-none">{{ item.title }}</a>
+                    </h5>
+                    <p class="card-text text-muted">{{ item.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                    <p class="card-text">{{ item.content[:200] }}{% if item.content|length > 200 %}...{% endif %}</p>
+                    <a href="{{ url_for('news_detail', news_id=item.id) }}" class="btn btn-primary">Читать далее</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Новостей в этом разделе пока нет.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<p><a href="{{ url_for('index') }}">← Вернуться на главную</a></p>
 {% endblock %}

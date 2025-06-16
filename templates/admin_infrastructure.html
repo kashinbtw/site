@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Управление объектами инфраструктуры</h2>
+    
+    <!-- Форма добавления нового объекта -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Добавить новый объект</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Название объекта</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Тип объекта</label>
+                            <select class="form-control" id="type" name="type" required>
+                                <option value="road">Дорога</option>
+                                <option value="transport">Транспорт</option>
+                                <option value="housing">ЖКХ</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Описание</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="latitude">Широта</label>
+                            <input type="number" step="any" class="form-control" id="latitude" name="latitude" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Долгота</label>
+                            <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="photos">Фотографии</label>
+                            <input type="file" class="form-control-file" id="photos" name="photos" multiple accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Добавить объект</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Список существующих объектов -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Существующие объекты</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Тип</th>
+                            <th>Описание</th>
+                            <th>Фотографии</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in infrastructure %}
+                        <tr>
+                            <td>{{ obj.name }}</td>
+                            <td>{{ obj.type }}</td>
+                            <td>{{ obj.description }}</td>
+                            <td>
+                                {% for photo in obj.photos %}
+                                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+                                     alt="Фото объекта" 
+                                     style="max-width: 100px; margin: 5px;">
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-info">Редактировать</a>
+                                <a href="#" class="btn btn-sm btn-danger">Удалить</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

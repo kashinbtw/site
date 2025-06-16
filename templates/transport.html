@@ -65,8 +65,9 @@
     <ul>
       {% for item in news %}
         <li>
-          <strong>{{ item.title }}</strong><br />
-          <p>{{ item.content }}</p>
+          <strong><a href="{{ url_for('news_detail', news_id=item.id) }}">{{ item.title }}</a></strong><br />
+          <p>{{ item.content[:200] }}{% if item.content|length > 200 %}...{% endif %}</p>
+          <a href="{{ url_for('news_detail', news_id=item.id) }}" class="btn btn-primary">Читать далее</a>
         </li>
       {% endfor %}
     </ul>

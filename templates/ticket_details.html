@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>{{ ticket.topic }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <h5>Описание проблемы:</h5>
+                    <p>{{ ticket.description }}</p>
+                    
+                    <h5>Адрес:</h5>
+                    <p>{{ ticket.address }}</p>
+                    
+                    <h5>Контактное лицо:</h5>
+                    <p>{{ ticket.contact_person }}</p>
+                    
+                    <h5>Статус:</h5>
+                    <p>{{ ticket.status.value }}</p>
+                    
+                    {% if ticket.admin_comment %}
+                    <h5>Комментарий администратора:</h5>
+                    <p>{{ ticket.admin_comment }}</p>
+                    {% endif %}
+                    
+                    <h5>Дата создания:</h5>
+                    <p>{{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+                
+                <div class="col-md-4">
+                    {% if ticket.photos %}
+                    <h5>Фотографии:</h5>
+                    <div class="photo-gallery">
+                        {% for photo in ticket.photos %}
+                        <div class="mb-3">
+                            <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+                                 alt="Фото к заявке" 
+                                 class="img-fluid rounded"
+                                 style="max-width: 100%;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if is_admin %}
+            <div class="mt-4">
+                <h5>Изменить статус:</h5>
+                <form method="POST" action="{{ url_for('update_ticket_status', ticket_id=ticket.id) }}" class="form-inline">
+                    <select name="status" class="form-control mr-2">
+                        <option value="Новая" {% if ticket.status.value == 'Новая' %}selected{% endif %}>Новая</option>
+                        <option value="В работе" {% if ticket.status.value == 'В работе' %}selected{% endif %}>В работе</option>
+                        <option value="Решена" {% if ticket.status.value == 'Решена' %}selected{% endif %}>Решена</option>
+                        <option value="Закрыта" {% if ticket.status.value == 'Закрыта' %}selected{% endif %}>Закрыта</option>
+                    </select>
+                    <textarea name="admin_comment" class="form-control mr-2" placeholder="Комментарий администратора">{{ ticket.admin_comment or '' }}</textarea>
+                    <button type="submit" class="btn btn-primary">Обновить</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

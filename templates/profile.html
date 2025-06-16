@@ -65,29 +65,84 @@
   }
 </style>
 
-<div style="max-width: 700px; margin: 0 auto; padding: 15px;">
-  <h2>Личный кабинет</h2>
-  <p>Добро пожаловать, <strong>{{ username }}</strong>!</p>
-  <p>Ваша роль: <strong>{{ role }}</strong></p>
+<div class="container mt-4">
+    <h2>Личный кабинет</h2>
+    <p>Добро пожаловать, {{ username }}!</p>
+    <p>Ваша роль: {{ role }}</p>
 
-  <h3>Мои заявки</h3>
-  {% if tickets %}
-    <ul>
-      {% for ticket in tickets %}
-        <li>
-          <strong>Тема:</strong> {{ ticket.topic }}<br />
-          <strong>Описание:</strong> {{ ticket.description }}<br />
-          <strong>Статус:</strong> {{ ticket.status_label }}<br />
-          <strong>Адрес:</strong> {{ ticket.address }}<br />
-          <strong>Контактное лицо:</strong> {{ ticket.contact_person }}
-		  <p><strong>Дата обращения:</strong> {{ ticket.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>У вас пока нет заявок.</p>
-  {% endif %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Поиск по теме или описанию...">
+        </div>
+        <div class="col-md-4">
+            <select id="statusFilter" class="form-control">
+                <option value="">Все статусы</option>
+                <option value="Новая">Новая</option>
+                <option value="В работе">В работе</option>
+                <option value="Решена">Решена</option>
+                <option value="Закрыта">Закрыта</option>
+            </select>
+        </div>
+    </div>
 
-  <p><a href="{{ url_for('submit_ticket') }}">Оформить новую заявку</a></p>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тема</th>
+                    <th>Описание</th>
+                    <th>Статус</th>
+                    <th>Дата создания</th>
+                </tr>
+            </thead>
+            <tbody id="ticketsTableBody">
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td><a href="/ticket/{{ ticket.id }}">{{ ticket.topic }}</a></td>
+                    <td>{{ ticket.description }}</td>
+                    <td>{{ ticket.status.value }}</td>
+                    <td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script>
+let searchTimeout;
+
+function updateTickets() {
+    const searchQuery = document.getElementById('searchInput').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    fetch(`/api/search_user_tickets?q=${encodeURIComponent(searchQuery)}&status=${encodeURIComponent(statusFilter)}`)
+        .then(response => response.json())
+        .then(tickets => {
+            const tbody = document.getElementById('ticketsTableBody');
+            tbody.innerHTML = '';
+            
+            tickets.forEach(ticket => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ticket.id}</td>
+                    <td><a href="/ticket/${ticket.id}">${ticket.topic}</a></td>
+                    <td>${ticket.description}</td>
+                    <td>${ticket.status}</td>
+                    <td>${ticket.created_at}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(updateTickets, 300);
+});
+
+document.getElementById('statusFilter').addEventListener('change', updateTickets);
+</script>
 {% endblock %}

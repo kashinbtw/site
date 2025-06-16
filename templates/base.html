@@ -126,6 +126,7 @@
             <li><a href="{{ url_for('housing') }}">ЖКХ</a></li>
             <li><a href="{{ url_for('roads') }}">Дорожное хозяйство</a></li>
             <li><a href="{{ url_for('transport') }}">Транспорт</a></li>
+            <li><a href="{{ url_for('help_page') }}">Справочные материалы</a></li>
             {% if session.get('username') %}
                 <li><a href="{{ url_for('profile') }}">Личный кабинет ({{ session['username'] }})</a></li>
                 {% if users[session['username']]['role'] != 'admin' %}
@@ -152,8 +153,10 @@
     {% endwith %}
     {% block content %}{% endblock %}
 </main>
-<footer>
-    <p>© 2025 Администрация города</p>
+<footer class="footer mt-auto py-3 bg-dark">
+    <div class="container text-center">
+        <p class="text-white mb-0">© 2025 Администрация города Орска. Все права защищены.</p>
+    </div>
 </footer>
 
 <script>

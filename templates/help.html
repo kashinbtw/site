@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Справочные материалы</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Инструкция по подаче заявок</h3>
+                    <div class="accordion" id="instructionsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#step1">
+                                    Шаг 1: Регистрация и вход
+                                </button>
+                            </h2>
+                            <div id="step1" class="accordion-collapse collapse show" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Нажмите кнопку "Войти" в верхнем меню</li>
+                                        <li>Введите свои учетные данные</li>
+                                        <li>Если у вас нет учетной записи, обратитесь к администратору</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step2">
+                                    Шаг 2: Создание заявки
+                                </button>
+                            </h2>
+                            <div id="step2" class="accordion-collapse collapse" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Перейдите в раздел "Отправить заявку"</li>
+                                        <li>Заполните все обязательные поля:
+                                            <ul>
+                                                <li>Тема заявки</li>
+                                                <li>Подробное описание проблемы</li>
+                                                <li>Адрес</li>
+                                                <li>Контактное лицо</li>
+                                            </ul>
+                                        </li>
+                                        <li>Нажмите кнопку "Отправить заявку"</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step3">
+                                    Шаг 3: Отслеживание статуса
+                                </button>
+                            </h2>
+                            <div id="step3" class="accordion-collapse collapse" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Перейдите в раздел "Личный кабинет"</li>
+                                        <li>Найдите свою заявку в списке</li>
+                                        <li>Нажмите на тему заявки для просмотра подробной информации</li>
+                                        <li>Следите за обновлениями статуса и комментариями администратора</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Часто задаваемые вопросы (FAQ)</h3>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Как долго обрабатывается заявка?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Стандартный срок обработки заявки - до 3 рабочих дней. В случае сложных проблем срок может быть продлен.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Можно ли отредактировать отправленную заявку?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    К сожалению, после отправки заявку нельзя отредактировать. Если вам нужно внести изменения, создайте новую заявку.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Что делать, если заявка отклонена?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Если заявка отклонена, внимательно прочитайте комментарий администратора. При необходимости создайте новую заявку с исправленной информацией.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Как узнать о решении проблемы?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    О решении проблемы вы будете уведомлены через комментарий администратора в вашей заявке. Статус заявки также будет обновлен.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Bootstrap JS для работы аккордеона -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %} 

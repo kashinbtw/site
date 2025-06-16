@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Редактирование новости</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Заголовок</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ news.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Категория</label>
+                            <select class="form-select" id="category" name="category" required>
+                                {% for category in categories %}
+                                <option value="{{ category }}" {% if category == news.category %}selected{% endif %}>{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Содержание</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required>{{ news.content }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Изображение</label>
+                            {% if news.image_path %}
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + news.image_path) }}" class="img-thumbnail" style="max-height: 200px;" alt="Текущее изображение">
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <small class="form-text text-muted">Оставьте пустым, чтобы сохранить текущее изображение</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            <a href="{{ url_for('news_detail', news_id=news.id) }}" class="btn btn-secondary">Отмена</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

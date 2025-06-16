@@ -155,26 +155,28 @@ form.search-form button:focus {
 	  <input type="text" name="q" placeholder="Поиск новостей по заголовку" value="{{ request.args.get('q', '') }}" />
 	  <button type="submit">Поиск</button>
 	</form>
-  {% for category in categories %}
-    <section aria-labelledby="category-{{ loop.index }}">
-      <h4 id="category-{{ loop.index }}">
-        <a href="{{ url_for('category_page', category_name=category) }}">{{ category }}</a>
-      </h4>
-      {% if grouped_news[category] %}
-        <ul>
-          {% for item in grouped_news[category][:3] %} {# Показываем 3 последних новости #}
-            <li>
-              <strong>{{ item.title }}</strong><br />
-			  <small>{{ item.date.strftime('%d.%m.%Y') }}</small>  {# Формат даты: день.месяц.год #}<br />
-              <p>{{ item.content }}</p>
-            </li>
-          {% endfor %}
-        </ul>
-        <p><a class="more-link" href="{{ url_for('category_page', category_name=category) }}">Все новости раздела &raquo;</a></p>
-      {% else %}
-        <p>Новостей в этом разделе пока нет.</p>
-      {% endif %}
-    </section>
+  {% for category, news_list in grouped_news.items() %}
+    {% if news_list %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>{{ category }}</h3>
+        </div>
+        <div class="card-body">
+            {% for news in news_list %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ url_for('news_detail', news_id=news.id) }}" class="text-decoration-none">{{ news.title }}</a>
+                    </h5>
+                    <p class="card-text text-muted">{{ news.date.strftime('%d.%m.%Y %H:%M') }}</p>
+                    <p class="card-text">{{ news.content[:200] }}{% if news.content|length > 200 %}...{% endif %}</p>
+                    <a href="{{ url_for('news_detail', news_id=news.id) }}" class="btn btn-primary">Читать далее</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
   {% endfor %}
 </div>
 {% endblock %}
