@@ -32,6 +32,49 @@
     font-weight: 700;
   }
 
+  form.search-form {
+    display: flex;
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #fff;
+  }
+
+  form.search-form input[type="text"] {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+    border-radius: 25px 0 0 25px;
+    transition: background-color 0.3s ease;
+  }
+
+  form.search-form input[type="text"]:focus {
+    background-color: #f0f8ff;
+  }
+
+  form.search-form button {
+    background-color: #0066cc;
+    border: none;
+    color: white;
+    padding: 0 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 0 25px 25px 0;
+    transition: background-color 0.3s ease;
+  }
+
+  form.search-form button:hover,
+  form.search-form button:focus {
+    background-color: #004d99;
+    outline: none;
+  }
+
   /* Адаптивность */
   @media (max-width: 768px) {
     h2 {
@@ -54,6 +97,25 @@
     p, li {
       font-size: 0.9rem;
     }
+    form.search-form {
+      flex-direction: column;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    form.search-form input[type="text"],
+    form.search-form button {
+      border-radius: 0;
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1rem;
+    }
+    form.search-form input[type="text"] {
+      border-radius: 10px 10px 0 0;
+      margin-bottom: 5px;
+    }
+    form.search-form button {
+      border-radius: 0 0 10px 10px;
+    }
   }
 </style>
 
@@ -61,6 +123,10 @@
   <h2>Транспорт</h2>
   <p>Расписание общественного транспорта, маршруты, новости и изменения в работе транспорта.</p>
   <h3>Новости раздела: {{ category }}</h3>
+  <form method="get" action="{{ url_for('transport') }}" class="search-form">
+    <input type="text" name="q" placeholder="Поиск новостей по заголовку" value="{{ request.args.get('q', '') }}" />
+    <button type="submit">Поиск</button>
+  </form>
   {% if news %}
     <ul>
       {% for item in news %}

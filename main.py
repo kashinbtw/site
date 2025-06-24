@@ -125,19 +125,166 @@ class Comment(db.Model):
         return f"Comment('{self.username}', '{self.date}')"
 
 
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user = db.Column(db.String(20), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # Создание таблиц в базе данных
 with app.app_context():
-    # Создаем все таблицы, если их нет
+    # Удаляем все таблицы
+    db.drop_all()
+    
+    # Создаем все таблицы
     db.create_all()
     
-    # Проверяем, есть ли уже пользователи в базе
-    if not User.query.first():
-        # Создаем пользователей
-        user = User(username='user', password='userpass', role=Role.USER)
-        admin = User(username='admin', password='adminpass', role=Role.ADMIN)
-        db.session.add(user)
-        db.session.add(admin)
-        db.session.commit()
+    # Создаем пользователей
+    user = User(username='user', password='userpass', role=Role.USER)
+    admin = User(username='admin', password='adminpass', role=Role.ADMIN)
+    db.session.add(user)
+    db.session.add(admin)
+    db.session.commit()
+    
+    # Создаем тестовые объекты инфраструктуры
+    test_infrastructure = [
+        InfrastructureObject(
+            name='Центральный парк',
+            type='housing',
+            description='Главный парк города с детскими площадками и зонами отдыха',
+            address='ул. Ленина, 15, кв. 45',
+            latitude=51.2295,
+            longitude=58.4751
+        ),
+        InfrastructureObject(
+            name='Автовокзал',
+            type='transport',
+            description='Междугородний автовокзал',
+            address='ул. Советская, 20',
+            latitude=51.2312,
+            longitude=58.4789
+        ),
+        InfrastructureObject(
+            name='Проспект Мира',
+            type='road',
+            description='Главная улица города',
+            address='пр. Мира, 8',
+            latitude=51.2287,
+            longitude=58.4732
+        ),
+        InfrastructureObject(
+            name='Железнодорожный вокзал',
+            type='transport',
+            description='Железнодорожный вокзал станции Орск',
+            address='ул. Гагарина, 25',
+            latitude=51.2278,
+            longitude=58.4765
+        ),
+        InfrastructureObject(
+            name='Торговый центр "Орск"',
+            type='housing',
+            description='Крупный торговый центр',
+            address='ул. Ленина, 15, кв. 45',
+            latitude=51.2301,
+            longitude=58.4743
+        )
+    ]
+    
+    # Добавляем объекты инфраструктуры
+    for obj in test_infrastructure:
+        db.session.add(obj)
+    db.session.commit()
+    
+    # Добавляем тестовые новости
+    test_news = [
+        # ЖКХ
+        News(
+            title='Ремонт теплотрассы на ул. Ленина',
+            content='В связи с плановыми работами по ремонту теплотрассы на ул. Ленина, 15-17 июня будет ограничено горячее водоснабжение в домах №10-25. Ремонтные работы продлятся с 9:00 до 18:00.',
+            category=CATEGORIES['housing'],
+            date=datetime.utcnow()
+        ),
+        News(
+            title='Обновление детских площадок в микрорайоне',
+            content='В рамках программы благоустройства городской среды в микрорайоне "Северный" началась установка новых детских площадок. Работы планируется завершить к началу летнего сезона.',
+            category=CATEGORIES['housing'],
+            date=datetime.utcnow()
+        ),
+        # Транспорт
+        News(
+            title='Изменение маршрута автобуса №5',
+            content='С 20 июня автобусный маршрут №5 будет временно изменен в связи с ремонтом дорожного покрытия на ул. Советской. Временная остановка будет организована на ул. Пушкина.',
+            category=CATEGORIES['transport'],
+            date=datetime.utcnow()
+        ),
+        News(
+            title='Новый автобусный парк',
+            content='В город поступили 10 новых автобусов большой вместимости. Они будут задействованы на маршрутах №1, №3 и №7, что позволит улучшить качество обслуживания пассажиров.',
+            category=CATEGORIES['transport'],
+            date=datetime.utcnow()
+        ),
+        # Дороги
+        News(
+            title='Ремонт проспекта Мира',
+            content='Начался капитальный ремонт проспекта Мира. Работы будут проводиться в ночное время с 23:00 до 6:00. Проезд будет осуществляться по временной схеме движения.',
+            category=CATEGORIES['roads'],
+            date=datetime.utcnow()
+        ),
+        News(
+            title='Установка новых светофоров',
+            content='В рамках программы повышения безопасности дорожного движения на перекрестке ул. Гагарина и пр. Ленина установлены новые светофорные объекты с табло обратного отсчета.',
+            category=CATEGORIES['roads'],
+            date=datetime.utcnow()
+        )
+    ]
+    
+    # Добавляем новости
+    for news in test_news:
+        db.session.add(news)
+    db.session.commit()
+    
+    # Добавляем тестовые заявки
+    test_tickets = [
+        Ticket(
+            username='user',
+            topic='Протечка крыши в подъезде',
+            description='В подъезде №3 на 5 этаже протекает крыша. Вода капает на лестничную площадку, создавая опасность для жильцов.',
+            address='ул. Ленина, 15, кв. 45',
+            contact_person='Иванов Иван Иванович, тел. 8-999-123-45-67',
+            status=TicketStatus.NEW,
+            latitude=51.2298,
+            longitude=58.4755
+        ),
+        Ticket(
+            username='user',
+            topic='Не работает лифт',
+            description='Лифт в подъезде №1 не работает уже 2 дня. Пожилым людям сложно подниматься по лестнице.',
+            address='пр. Мира, 8, кв. 12',
+            contact_person='Петрова Мария, тел. 8-999-765-43-21',
+            status=TicketStatus.IN_PROGRESS,
+            admin_comment='Отправлена заявка в обслуживающую компанию. Ожидаем мастера.',
+            latitude=51.2287,
+            longitude=58.4732
+        ),
+        Ticket(
+            username='user',
+            topic='Разбитое окно в подъезде',
+            description='В подъезде разбито окно на первом этаже. Нужно срочно заменить, так как на улице холодно.',
+            address='ул. Гагарина, 25, кв. 3',
+            contact_person='Сидоров Алексей, тел. 8-999-555-44-33',
+            status=TicketStatus.RESOLVED,
+            admin_comment='Окно заменено 15.03.2024',
+            latitude=51.2305,
+            longitude=58.4768
+        )
+    ]
+    
+    # Добавляем заявки
+    for ticket in test_tickets:
+        db.session.add(ticket)
+    db.session.commit()
 
 
 # Декоратор для проверки авторизации пользователя
@@ -207,7 +354,14 @@ def housing():
     Отображает все новости, относящиеся к жилищно-коммунальному хозяйству.
     """
     category = CATEGORIES['housing']
-    news = News.query.filter_by(category=category).all()
+    search_query = request.args.get('q', '')
+    if search_query:
+        news = News.query.filter(
+            News.category == category,
+            News.title.ilike(f'%{search_query}%')
+        ).order_by(News.date.desc()).all()
+    else:
+        news = News.query.filter_by(category=category).order_by(News.date.desc()).all()
     return render_template('housing.html', news=news, category=category)
 
 
@@ -218,7 +372,14 @@ def roads():
     Отображает все новости, относящиеся к дорожному хозяйству.
     """
     category = CATEGORIES['roads']
-    news = News.query.filter_by(category=category).all()
+    search_query = request.args.get('q', '')
+    if search_query:
+        news = News.query.filter(
+            News.category == category,
+            News.title.ilike(f'%{search_query}%')
+        ).order_by(News.date.desc()).all()
+    else:
+        news = News.query.filter_by(category=category).order_by(News.date.desc()).all()
     return render_template('roads.html', news=news, category=category)
 
 
@@ -229,7 +390,14 @@ def transport():
     Отображает все новости, относящиеся к транспорту.
     """
     category = CATEGORIES['transport']
-    news = News.query.filter_by(category=category).all()
+    search_query = request.args.get('q', '')
+    if search_query:
+        news = News.query.filter(
+            News.category == category,
+            News.title.ilike(f'%{search_query}%')
+        ).order_by(News.date.desc()).all()
+    else:
+        news = News.query.filter_by(category=category).order_by(News.date.desc()).all()
     return render_template('transport.html', news=news, category=category)
 
 
@@ -245,6 +413,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             session['username'] = username
+            session['role'] = user.role.value
             flash('Вы успешно вошли в систему.', 'success')
             next_page = request.args.get('next')
             return redirect(next_page or url_for('profile'))
@@ -274,8 +443,13 @@ def profile():
     """
     username = session['username']
     user = User.query.filter_by(username=username).first()
-    tickets = Ticket.query.filter_by(username=username).all()
-    return render_template('profile.html', username=username, role=user.role.value, tickets=tickets)
+    tickets = Ticket.query.filter_by(username=username).order_by(Ticket.id.desc()).all()
+    notifications = Notification.query.filter_by(user=username, is_read=False).order_by(Notification.created_at.desc()).all()
+    # Помечаем уведомления как прочитанные
+    for n in notifications:
+        n.is_read = True
+    db.session.commit()
+    return render_template('profile.html', username=username, role=user.role.value, tickets=tickets, notifications=notifications)
 
 
 def get_coordinates(address):
@@ -474,7 +648,11 @@ def view_ticket(ticket_id):
     if ticket.username != session['username'] and User.query.filter_by(username=session['username']).first().role != Role.ADMIN:
         abort(403)
     is_admin = User.query.filter_by(username=session['username']).first().role == Role.ADMIN
-    return render_template('ticket_details.html', ticket=ticket, is_admin=is_admin)
+    notifications = Notification.query.filter_by(user=session['username'], is_read=False).order_by(Notification.created_at.desc()).all()
+    for n in notifications:
+        n.is_read = True
+    db.session.commit()
+    return render_template('ticket_details.html', ticket=ticket, is_admin=is_admin, notifications=notifications)
 
 
 @app.route('/api/update_ticket_status/<int:ticket_id>', methods=['POST'])
@@ -488,15 +666,57 @@ def update_ticket_status(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     new_status = request.form.get('status')
     admin_comment = request.form.get('admin_comment', '').strip()
-    
     try:
         status_enum = TicketStatus(new_status)
         ticket.status = status_enum
         ticket.admin_comment = admin_comment
         db.session.commit()
-        return jsonify({'success': True})
+        # Создаём уведомление для пользователя
+        notif_text = f'Статус вашей заявки "{ticket.topic}" изменён на "{ticket.status.value}".'
+        if admin_comment:
+            notif_text += f' Комментарий администратора: {admin_comment}'
+        notif = Notification(user=ticket.username, message=notif_text)
+        db.session.add(notif)
+        db.session.commit()
+        flash('Статус заявки обновлён', 'success')
+        return redirect(url_for('admin_tickets'))
     except ValueError:
-        return jsonify({'success': False, 'error': 'Неверный статус'}), 400
+        flash('Ошибка: неверный статус', 'danger')
+        return redirect(url_for('admin_tickets'))
+
+
+@app.route('/ticket/<int:ticket_id>/comment', methods=['POST'])
+@login_required
+def add_ticket_comment(ticket_id):
+    """
+    Добавление комментария к заявке (от пользователя или администратора).
+    """
+    ticket = Ticket.query.get_or_404(ticket_id)
+    comment = request.form.get('comment', '').strip()
+    if not comment:
+        flash('Комментарий не может быть пустым', 'warning')
+        return redirect(url_for('view_ticket', ticket_id=ticket_id))
+    # Можно добавить отдельную таблицу для комментариев, но пока просто добавим к admin_comment
+    ticket.admin_comment = comment
+    db.session.commit()
+    # Создаём уведомление для пользователя
+    notif = Notification(user=ticket.username, message=f'Добавлен новый комментарий к вашей заявке "{ticket.topic}": {comment}')
+    db.session.add(notif)
+    db.session.commit()
+    flash('Комментарий добавлен', 'success')
+    return redirect(url_for('view_ticket', ticket_id=ticket_id))
+
+
+@app.route('/notifications')
+@login_required
+def notifications():
+    username = session['username']
+    notifs = Notification.query.filter_by(user=username, is_read=False).order_by(Notification.created_at.desc()).all()
+    # Помечаем как прочитанные
+    for n in notifs:
+        n.is_read = True
+    db.session.commit()
+    return render_template('notifications.html', notifications=notifs)
 
 
 @app.route('/category/<category_name>')
@@ -810,6 +1030,48 @@ def delete_infrastructure(obj_id):
     db.session.commit()
     flash('Объект инфраструктуры успешно удален.', 'success')
     return redirect(url_for('admin_infrastructure'))
+
+
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    """
+    Страница управления пользователями.
+    Отображает список всех пользователей и позволяет управлять их ролями.
+    Требует прав администратора.
+    """
+    users = User.query.all()
+    return render_template('admin_users.html', users=users, current_user=session['username'])
+
+
+@app.route('/admin/users/<int:user_id>/role', methods=['POST'])
+@admin_required
+def change_user_role(user_id):
+    """
+    Изменение роли пользователя.
+    Позволяет назначать и снимать права администратора.
+    Требует прав администратора.
+    """
+    user = User.query.get_or_404(user_id)
+    action = request.form.get('action')
+    
+    # Проверяем, не пытается ли админ изменить свою роль
+    if user.username == session['username']:
+        flash('Вы не можете изменить свою роль.', 'danger')
+        return redirect(url_for('admin_users'))
+    
+    if action == 'promote':
+        user.role = Role.ADMIN
+        flash(f'Пользователь {user.username} назначен администратором.', 'success')
+    elif action == 'demote':
+        user.role = Role.USER
+        flash(f'У пользователя {user.username} сняты права администратора.', 'success')
+    
+    db.session.commit()
+    # Если меняется роль текущего пользователя, обновляем session['role']
+    if user.username == session.get('username'):
+        session['role'] = user.role.value
+    return redirect(url_for('admin_users'))
 
 
 if __name__ == '__main__':

@@ -102,14 +102,21 @@
 
       @media (max-width: 768px) {
         nav ul {
-        flex-direction: column;
-    }
+          flex-direction: column;
+          display: none;
+          width: 100%;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #0066cc;
+        }
         nav ul.active {
           display: flex;
         }
         nav li {
           margin: 5px 0;
           text-align: center;
+          width: 100%;
         }
         .menu-toggle {
           display: block;
@@ -133,10 +140,10 @@
             <li><a href="{{ url_for('help_page') }}">Справочные материалы</a></li>
             {% if session.get('username') %}
                 <li><a href="{{ url_for('profile') }}">Личный кабинет ({{ session['username'] }})</a></li>
-                {% if users[session['username']]['role'] != 'admin' %}
+                {% if session['role'] != 'admin' %}
                     <li><a href="{{ url_for('submit_ticket') }}">Оформить заявку</a></li>
                 {% endif %}
-                {% if users[session['username']]['role'] == 'admin' %}
+                {% if session['role'] == 'admin' %}
                     <li><a href="{{ url_for('admin_panel') }}">Админ-панель</a></li>
                     <li><a href="{{ url_for('admin_tickets') }}">Заявки пользователей</a></li>
                 {% endif %}

@@ -109,6 +109,16 @@
             </tbody>
         </table>
     </div>
+
+    {% if notifications %}
+    <div class="alert alert-info" role="alert">
+        <ul style="margin-bottom:0;">
+            {% for n in notifications %}
+            <li>{{ n.message }} <span style="font-size:0.9em;color:#888;">({{ n.created_at.strftime('%d.%m.%Y %H:%M') }})</span></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </div>
 
 <script>
