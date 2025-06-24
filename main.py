@@ -133,160 +133,6 @@ class Notification(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-# Создание таблиц в базе данных
-with app.app_context():
-    # Удаляем все таблицы
-    db.drop_all()
-    
-    # Создаем все таблицы
-    db.create_all()
-    
-    # Создаем пользователей
-    user = User(username='user', password='userpass', role=Role.USER)
-    admin = User(username='admin', password='adminpass', role=Role.ADMIN)
-    db.session.add(user)
-    db.session.add(admin)
-    db.session.commit()
-    
-    # Создаем тестовые объекты инфраструктуры
-    test_infrastructure = [
-        InfrastructureObject(
-            name='Центральный парк',
-            type='housing',
-            description='Главный парк города с детскими площадками и зонами отдыха',
-            address='ул. Ленина, 15, кв. 45',
-            latitude=51.2295,
-            longitude=58.4751
-        ),
-        InfrastructureObject(
-            name='Автовокзал',
-            type='transport',
-            description='Междугородний автовокзал',
-            address='ул. Советская, 20',
-            latitude=51.2312,
-            longitude=58.4789
-        ),
-        InfrastructureObject(
-            name='Проспект Мира',
-            type='road',
-            description='Главная улица города',
-            address='пр. Мира, 8',
-            latitude=51.2287,
-            longitude=58.4732
-        ),
-        InfrastructureObject(
-            name='Железнодорожный вокзал',
-            type='transport',
-            description='Железнодорожный вокзал станции Орск',
-            address='ул. Гагарина, 25',
-            latitude=51.2278,
-            longitude=58.4765
-        ),
-        InfrastructureObject(
-            name='Торговый центр "Орск"',
-            type='housing',
-            description='Крупный торговый центр',
-            address='ул. Ленина, 15, кв. 45',
-            latitude=51.2301,
-            longitude=58.4743
-        )
-    ]
-    
-    # Добавляем объекты инфраструктуры
-    for obj in test_infrastructure:
-        db.session.add(obj)
-    db.session.commit()
-    
-    # Добавляем тестовые новости
-    test_news = [
-        # ЖКХ
-        News(
-            title='Ремонт теплотрассы на ул. Ленина',
-            content='В связи с плановыми работами по ремонту теплотрассы на ул. Ленина, 15-17 июня будет ограничено горячее водоснабжение в домах №10-25. Ремонтные работы продлятся с 9:00 до 18:00.',
-            category=CATEGORIES['housing'],
-            date=datetime.utcnow()
-        ),
-        News(
-            title='Обновление детских площадок в микрорайоне',
-            content='В рамках программы благоустройства городской среды в микрорайоне "Северный" началась установка новых детских площадок. Работы планируется завершить к началу летнего сезона.',
-            category=CATEGORIES['housing'],
-            date=datetime.utcnow()
-        ),
-        # Транспорт
-        News(
-            title='Изменение маршрута автобуса №5',
-            content='С 20 июня автобусный маршрут №5 будет временно изменен в связи с ремонтом дорожного покрытия на ул. Советской. Временная остановка будет организована на ул. Пушкина.',
-            category=CATEGORIES['transport'],
-            date=datetime.utcnow()
-        ),
-        News(
-            title='Новый автобусный парк',
-            content='В город поступили 10 новых автобусов большой вместимости. Они будут задействованы на маршрутах №1, №3 и №7, что позволит улучшить качество обслуживания пассажиров.',
-            category=CATEGORIES['transport'],
-            date=datetime.utcnow()
-        ),
-        # Дороги
-        News(
-            title='Ремонт проспекта Мира',
-            content='Начался капитальный ремонт проспекта Мира. Работы будут проводиться в ночное время с 23:00 до 6:00. Проезд будет осуществляться по временной схеме движения.',
-            category=CATEGORIES['roads'],
-            date=datetime.utcnow()
-        ),
-        News(
-            title='Установка новых светофоров',
-            content='В рамках программы повышения безопасности дорожного движения на перекрестке ул. Гагарина и пр. Ленина установлены новые светофорные объекты с табло обратного отсчета.',
-            category=CATEGORIES['roads'],
-            date=datetime.utcnow()
-        )
-    ]
-    
-    # Добавляем новости
-    for news in test_news:
-        db.session.add(news)
-    db.session.commit()
-    
-    # Добавляем тестовые заявки
-    test_tickets = [
-        Ticket(
-            username='user',
-            topic='Протечка крыши в подъезде',
-            description='В подъезде №3 на 5 этаже протекает крыша. Вода капает на лестничную площадку, создавая опасность для жильцов.',
-            address='ул. Ленина, 15, кв. 45',
-            contact_person='Иванов Иван Иванович, тел. 8-999-123-45-67',
-            status=TicketStatus.NEW,
-            latitude=51.2298,
-            longitude=58.4755
-        ),
-        Ticket(
-            username='user',
-            topic='Не работает лифт',
-            description='Лифт в подъезде №1 не работает уже 2 дня. Пожилым людям сложно подниматься по лестнице.',
-            address='пр. Мира, 8, кв. 12',
-            contact_person='Петрова Мария, тел. 8-999-765-43-21',
-            status=TicketStatus.IN_PROGRESS,
-            admin_comment='Отправлена заявка в обслуживающую компанию. Ожидаем мастера.',
-            latitude=51.2287,
-            longitude=58.4732
-        ),
-        Ticket(
-            username='user',
-            topic='Разбитое окно в подъезде',
-            description='В подъезде разбито окно на первом этаже. Нужно срочно заменить, так как на улице холодно.',
-            address='ул. Гагарина, 25, кв. 3',
-            contact_person='Сидоров Алексей, тел. 8-999-555-44-33',
-            status=TicketStatus.RESOLVED,
-            admin_comment='Окно заменено 15.03.2024',
-            latitude=51.2305,
-            longitude=58.4768
-        )
-    ]
-    
-    # Добавляем заявки
-    for ticket in test_tickets:
-        db.session.add(ticket)
-    db.session.commit()
-
-
 # Декоратор для проверки авторизации пользователя
 def login_required(f):
     @wraps(f)
@@ -516,18 +362,30 @@ def submit_ticket():
             files = request.files.getlist('photos')
             for file in files:
                 if file and file.filename and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    file.save(file_path)
-                    photo = Photo(
-                        filename=filename,
-                        ticket=ticket
-                    )
-                    db.session.add(photo)
-
+                    try:
+                        filename = secure_filename(file.filename)
+                        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        file.save(file_path)
+                        photo = Photo(
+                            filename=filename,
+                            ticket_id=None  # временно, добавим после коммита заявки
+                        )
+                        db.session.add(photo)
+                    except Exception as e:
+                        flash(f'Ошибка при загрузке файла: {file.filename}. {str(e)}', 'danger')
+                        return redirect(url_for('submit_ticket'))
         db.session.add(ticket)
         db.session.commit()
+        # После коммита заявки связываем фото с заявкой
+        if 'photos' in request.files:
+            files = request.files.getlist('photos')
+            for file in files:
+                if file and file.filename and allowed_file(file.filename):
+                    photo = Photo.query.filter_by(filename=secure_filename(file.filename), ticket_id=None).first()
+                    if photo:
+                        photo.ticket_id = ticket.id
+            db.session.commit()
         flash('Заявка успешно отправлена.', 'success')
         return redirect(url_for('submit_ticket'))
 
