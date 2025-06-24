@@ -686,7 +686,13 @@ def show_map():
     Страница интерактивной карты.
     Отображает заявки и объекты инфраструктуры на карте города.
     """
-    m = folium.Map(location=[51.2295, 58.4751], zoom_start=13)
+    m = folium.Map(location=[51.2295, 58.4751], zoom_start=13, control_scale=True)
+    folium.TileLayer(
+        tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attr=' ',
+        name='OpenStreetMap',
+        control=False
+    ).add_to(m)
     
     tickets = Ticket.query.filter(Ticket.latitude.isnot(None), Ticket.longitude.isnot(None)).all()
     print(f"Found {len(tickets)} tickets with coordinates")  # Отладочный вывод
@@ -721,7 +727,9 @@ def show_map():
             icon=folium.Icon(color='blue', icon='info-sign')
         ).add_to(m)
     
-    return render_template('map.html', map=m._repr_html_())
+    # Возвращаем карту без iframe
+    map_html = m.get_root().render()
+    return render_template('map.html', map=map_html)
 
 
 @app.route('/admin/infrastructure', methods=['GET', 'POST'])
