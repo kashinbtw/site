@@ -3,7 +3,7 @@
 {% block content %}
 <style>
   /* Базовые стили */
- h2 {
+  h2 {
     color: #004080;
     font-size: 1.8rem;
     margin-bottom: 1rem;
@@ -21,15 +21,39 @@
     color: #333;
   }
   ul {
-    list-style: disc inside;
+    list-style: none;
     padding-left: 0;
     margin-bottom: 1rem;
   }
   li {
     margin-bottom: 1.2rem;
   }
-  li strong {
-    font-weight: 700;
+  li a {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #0066cc;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  li a:hover {
+    background-color: #004d99;
+    text-decoration: none;
+    color: white;
+  }
+  .admin-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    color: #004080;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #0066cc;
+    padding-bottom: 5px;
   }
 
   /* Адаптивность */
@@ -54,17 +78,64 @@
     p, li {
       font-size: 0.9rem;
     }
+    li a {
+      display: block;
+      text-align: center;
+    }
   }
-
 </style>
 
-<div style="max-width: 700px; margin: 0 auto; padding: 15px;">
+<div class="container mt-4">
   <h2>Административная панель</h2>
-  <p>Только для администраторов.</p>
-  <ul>
-    <li>Управление пользователями</li>
-    <li><a href="{{ url_for('admin_tickets') }}">Просмотр заявок</a></li>
-    <li><a href="{{ url_for('admin_news') }}">Управление новостями</a></li>
-  </ul>
+  <p>Добро пожаловать в панель управления. Выберите нужный раздел:</p>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="admin-section">
+        <div class="section-title">Управление заявками</div>
+        <ul>
+          <li><a href="{{ url_for('admin_tickets') }}">
+            <i class="fas fa-tasks"></i> Просмотр и обработка заявок
+          </a></li>
+          <li><a href="{{ url_for('show_map') }}">
+            <i class="fas fa-map-marker-alt"></i> Интерактивная карта заявок
+          </a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="admin-section">
+        <div class="section-title">Управление инфраструктурой</div>
+        <ul>
+          <li><a href="{{ url_for('admin_infrastructure') }}">
+            <i class="fas fa-building"></i> Объекты инфраструктуры
+          </a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="admin-section">
+        <div class="section-title">Управление контентом</div>
+        <ul>
+          <li><a href="{{ url_for('admin_news') }}">
+            <i class="fas fa-newspaper"></i> Управление новостями
+          </a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="admin-section">
+        <div class="section-title">Управление пользователями</div>
+        <ul>
+          <li><a href="#" onclick="alert('Функционал в разработке');">
+            <i class="fas fa-users"></i> Управление пользователями
+          </a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

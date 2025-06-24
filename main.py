@@ -58,10 +58,14 @@ class InfrastructureObject(db.Model):
     name = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(50), nullable=False)  # road, transport, housing
     description = db.Column(db.Text, nullable=True)
+    address = db.Column(db.Text, nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     photos = db.relationship('Photo', backref='infrastructure', lazy=True)
     tickets = db.relationship('Ticket', backref='infrastructure', lazy=True)
+
+    def __repr__(self):
+        return f"InfrastructureObject('{self.name}', '{self.type}')"
 
 
 class Photo(db.Model):
@@ -142,6 +146,7 @@ with app.app_context():
             name='Центральный парк',
             type='housing',
             description='Главный парк города с детскими площадками и зонами отдыха',
+            address='ул. Ленина, 15, кв. 45',
             latitude=51.2295,
             longitude=58.4751
         ),
@@ -149,6 +154,7 @@ with app.app_context():
             name='Автовокзал',
             type='transport',
             description='Междугородний автовокзал',
+            address='ул. Советская, 20',
             latitude=51.2312,
             longitude=58.4789
         ),
@@ -156,6 +162,7 @@ with app.app_context():
             name='Проспект Мира',
             type='road',
             description='Главная улица города',
+            address='пр. Мира, 8',
             latitude=51.2287,
             longitude=58.4732
         ),
@@ -163,6 +170,7 @@ with app.app_context():
             name='Железнодорожный вокзал',
             type='transport',
             description='Железнодорожный вокзал станции Орск',
+            address='ул. Гагарина, 25',
             latitude=51.2278,
             longitude=58.4765
         ),
@@ -170,6 +178,7 @@ with app.app_context():
             name='Торговый центр "Орск"',
             type='housing',
             description='Крупный торговый центр',
+            address='ул. Ленина, 15, кв. 45',
             latitude=51.2301,
             longitude=58.4743
         )
@@ -415,10 +424,20 @@ def get_coordinates(address):
     """
     try:
         geolocator = Nominatim(user_agent="my_app")
-        location = geolocator.geocode(address)
+        # Добавляем город Орск к адресу для более точного определения
+        full_address = f"{address}, Орск, Оренбургская область, Россия"
+        print(f"Trying to geocode address: {full_address}")  # Отладочный вывод
+        location = geolocator.geocode(full_address)
         if location:
+            print(f"Found coordinates: {location.latitude}, {location.longitude}")  # Отладочный вывод
             return location.latitude, location.longitude
+        else:
+            print("No coordinates found for address")  # Отладочный вывод
     except GeocoderTimedOut:
+        print("Geocoding timed out")  # Отладочный вывод
+        return None
+    except Exception as e:
+        print(f"Error during geocoding: {str(e)}")  # Отладочный вывод
         return None
     return None
 
@@ -442,7 +461,10 @@ def submit_ticket():
             return redirect(url_for('submit_ticket'))
 
         coordinates = get_coordinates(address)
-        latitude, longitude = coordinates if coordinates else (None, None)
+        if not coordinates:
+            flash('Не удалось определить координаты по введённому адресу. Проверьте корректность адреса или попробуйте другой.', 'warning')
+            return redirect(url_for('submit_ticket'))
+        latitude, longitude = coordinates
 
         username = session['username']
         ticket = Ticket(
@@ -806,7 +828,10 @@ def show_map():
     m = folium.Map(location=[51.2295, 58.4751], zoom_start=13)
     
     tickets = Ticket.query.filter(Ticket.latitude.isnot(None), Ticket.longitude.isnot(None)).all()
+    print(f"Found {len(tickets)} tickets with coordinates")  # Отладочный вывод
+    
     for ticket in tickets:
+        print(f"Adding ticket marker: {ticket.topic} at {ticket.latitude}, {ticket.longitude}")  # Отладочный вывод
         popup_text = f"""
         <b>{ticket.topic}</b><br>
         Статус: {ticket.status.value}<br>
@@ -820,7 +845,10 @@ def show_map():
         ).add_to(m)
     
     infrastructure = InfrastructureObject.query.all()
+    print(f"Found {len(infrastructure)} infrastructure objects")  # Отладочный вывод
+    
     for obj in infrastructure:
+        print(f"Adding infrastructure marker: {obj.name} at {obj.latitude}, {obj.longitude}")  # Отладочный вывод
         popup_text = f"""
         <b>{obj.name}</b><br>
         Тип: {obj.type}<br>
@@ -847,17 +875,25 @@ def admin_infrastructure():
         name = request.form.get('name', '').strip()
         type = request.form.get('type', '').strip()
         description = request.form.get('description', '').strip()
-        latitude = float(request.form.get('latitude', 0))
-        longitude = float(request.form.get('longitude', 0))
+        address = request.form.get('address', '').strip()
 
-        if not name or not type:
+        if not name or not type or not address:
             flash('Пожалуйста, заполните все обязательные поля.', 'warning')
             return redirect(url_for('admin_infrastructure'))
+
+        # Получаем координаты по адресу
+        coordinates = get_coordinates(address)
+        if not coordinates:
+            flash('Не удалось определить координаты по указанному адресу. Проверьте правильность адреса.', 'warning')
+            return redirect(url_for('admin_infrastructure'))
+        
+        latitude, longitude = coordinates
 
         infrastructure = InfrastructureObject(
             name=name,
             type=type,
             description=description,
+            address=address,
             latitude=latitude,
             longitude=longitude
         )
@@ -865,9 +901,11 @@ def admin_infrastructure():
         if 'photos' in request.files:
             files = request.files.getlist('photos')
             for file in files:
-                if file and allowed_file(file.filename):
+                if file and file.filename and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(file_path)
                     photo = Photo(
                         filename=filename,
                         infrastructure=infrastructure
@@ -881,6 +919,28 @@ def admin_infrastructure():
 
     infrastructure = InfrastructureObject.query.all()
     return render_template('admin_infrastructure.html', infrastructure=infrastructure)
+
+
+@app.route('/admin/infrastructure/delete/<int:obj_id>', methods=['POST'])
+@admin_required
+def delete_infrastructure(obj_id):
+    """
+    Удаляет объект инфраструктуры и связанные с ним фотографии.
+    """
+    obj = InfrastructureObject.query.get_or_404(obj_id)
+    
+    # Удаляем фотографии
+    for photo in obj.photos:
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], photo.filename))
+        except:
+            pass
+        db.session.delete(photo)
+    
+    db.session.delete(obj)
+    db.session.commit()
+    flash('Объект инфраструктуры успешно удален.', 'success')
+    return redirect(url_for('admin_infrastructure'))
 
 
 if __name__ == '__main__':
